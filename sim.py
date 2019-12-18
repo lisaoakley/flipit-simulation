@@ -26,7 +26,9 @@ class Simulation:
         env.config(obs_type,rew_type,rew_config,p0_strategy,p0_config,duration,p0_cost,p1_cost)
         observation = env.reset()
         a = self.gen_attacker(p1_strategy,env,p1_config,p1_cost,debug)
-        
+        with open(outfile, 'w') as f:
+            f.write('tick,p1_benefit,p0_benefit\n')
+
         # print info
         if debug:
             print('---\nRun {}'.format(run_id))
@@ -43,6 +45,10 @@ class Simulation:
             action = a.pre(tick,prev_observation)
             observation, reward, done, info = env.step(action)
             a.post(tick,prev_observation,observation,reward,action,info['true_action'])
+            if tick % 100 == 0:
+                with open(outfile, 'a') as f:
+                    f.write('{},{},{}\n'.format(tick,env.calc_benefit(1),env.calc_benefit(0)))
+
             if done:
                 if debug:
                     print('Attacker: {}\nDefender:{}'.format(p1_strategy,p0_strategy))
