@@ -2,7 +2,7 @@ import gym
 import gym_flipit
 import numpy as np
 import pprint
-from experiments.strategies import GreedyWrapper,Q,Renewal,PeriodicOptimal
+from strategies import GreedyWrapper,Q,Renewal,PeriodicOptimal
 
 class Simulation:
     # debug (bool): print info during play
@@ -21,7 +21,7 @@ class Simulation:
     def run(self,debug,outfile,p1_strategy,p1_config,p1_cost,p0_strategy,p0_config,p0_cost,duration,rew_type,rew_config,obs_type,run_id=0):
         # set up environment and players
         env = gym.make('Flipit-v0')
-        if rew_type == 'constant_minus_cost_norm'
+        if rew_type == 'constant_minus_cost_norm':
             rew_config['val'] = p0_config['avg_mv']
         env.config(obs_type,rew_type,rew_config,p0_strategy,p0_config,duration,p0_cost,p1_cost)
         observation = env.reset()
@@ -40,15 +40,14 @@ class Simulation:
         # run simulation
         for tick in range(duration):
             prev_observation = observation
-            action = a.pre(tick,prev_observation,i)
+            action = a.pre(tick,prev_observation)
             observation, reward, done, info = env.step(action)
             a.post(tick,prev_observation,observation,reward,action,info['true_action'])
             if done:
                 if debug:
-                    print('\n---\n{}: episode {} completed.'.format(all_configs['run_id'],i))
-                    print('Attacker: {}\nDefender:{}'.format(all_configs['p1_strategy'],all_configs['p0_strategy']))
-                    print('Total p1 benefit: {}'.format(all_configs['p1_avg_benefit']))
-                    print('Total p0 benefit: {}'.format(all_configs['p0_avg_benefit']))
+                    print('Attacker: {}\nDefender:{}'.format(p1_strategy,p0_strategy))
+                    print('Total p1 benefit: {}'.format(env.calc_benefit(1)))
+                    print('Total p0 benefit: {}'.format(env.calc_benefit(0)))
                     print(env.player_moves[0])
                     print(env.player_moves[1])
                     print("\n\n\n")

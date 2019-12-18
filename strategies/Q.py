@@ -1,8 +1,8 @@
 import numpy as np
 import random
 import pprint
-from experiments.strategies.exploration import choose_action
-from experiments.strategies.estimation import estimate_value
+from strategies.exploration import choose_action
+from strategies.estimation import estimate_value
 
 
 class Q:
@@ -11,7 +11,6 @@ class Q:
         self.a_space_size = a_space_size
         self.strategy = 'q-table'
         self.q_configs = q_configs
-        self.alpha = q_configs['alpha']
         self.gamma = q_configs['gamma']
         self.p = q_configs['p']
         self.exploration_type = q_configs['exploration_type']
@@ -20,7 +19,7 @@ class Q:
         self.T = {}
         self.actions_at_obs = {}
 
-    def pre(self,tick,prev_observation,episode):
+    def pre(self,tick,prev_observation):
         if not prev_observation in self.T or self.T[prev_observation][0] == self.T[prev_observation][1]:
                 if random.random() < self.p:
                     action = 0
@@ -31,7 +30,7 @@ class Q:
         elif self.exploration_type == 'epsilon-greedy':
             action = choose_action.epsilon_greedy(self.q_configs['explore_config']['epsilon'],self.T[prev_observation],tick,self.q_configs['explore_config']['decay_lambda'])
         elif self.exploration_type == 'epsilon-greedy-visit-decay':
-            action = choose_action.epsilon_greedy_visit_decay(self.q_configs['explore_config']['epsilon'],self.T[prev_observation],sum(self.actions_at_obs[prev_observation]),self.q_configs['explore_config']['decay_lambda'],self.q_configs['explore_config']['no_move_weight'])
+            action = choose_action.epsilon_greedy_visit_decay(self.q_configs['explore_config']['epsilon'],self.T[prev_observation],sum(self.actions_at_obs[prev_observation]),self.q_configs['explore_config']['decay_lambda'],self.p)
         elif self.exploration_type == 'uniform-epsilon-greedy-visit-decay':
             action = choose_action.uniform_epsilon_greedy_visit_decay(self.q_configs['explore_config']['epsilon'],self.T[prev_observation],sum(self.actions_at_obs[prev_observation]),self.q_configs['explore_config']['decay_lambda'])
         else:

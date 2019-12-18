@@ -1,4 +1,4 @@
-from experiments.strategies import Greedy
+from strategies import Greedy
 
 class GreedyWrapper:
     def __init__(self,p0,move_cost,debug=False):
